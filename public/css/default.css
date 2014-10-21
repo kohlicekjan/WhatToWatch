@@ -1,0 +1,205 @@
+*{
+    margin: 0;
+    padding: 0;
+    border: 0;   
+    text-decoration: none;
+}
+
+h1{
+    font-weight: lighter;   
+}
+
+a{
+    color: #333;
+}
+
+body{
+    background: #eee;
+    font:14px/1.6 normal Tahoma, Arial; 
+    color: #333;
+}
+
+body > header{
+    width: 100%;
+    min-height: 45px;
+    float:left;
+}
+
+body > header > nav{
+    min-height: 45px; 
+    width: 100%;
+    background: white;
+    position: fixed;
+    z-index: 100;
+    float:left;
+}
+
+body > header > nav a{
+    width: 17%;
+    display: inline-block;
+    line-height: 40px;
+    text-align: center;
+    font-size: 16px;
+    float: left;
+}
+
+body > header > nav a:hover, .activeBlue{
+    color: white;     
+}
+
+.menuBlue{
+    border-bottom: 5px solid #4D90FE;
+    color: #4D90FE;
+    width: 32%;
+}
+.menuBlue:hover, .activeBlue{
+    background: rgba(77,144,254,0.65);
+    color: white;
+}
+.menuGreen{
+    border-bottom: 5px solid #81b900;
+    color: #81b900;
+}
+.menuGreen:hover{
+    background: rgba(129,185,0,0.65);
+}
+.menuYellow{
+    border-bottom: 5px solid #ffb902;
+    color: #ffb902;
+}
+.menuYellow:hover{
+    background: rgba(255,185,2,0.65);
+}
+.menuRed{
+    border-bottom: 5px solid #f25022;
+    color: #f25022;
+}
+.menuRed:hover{
+    background: rgba(242,80,34,0.65);
+}
+.menuBlack{
+    border-bottom: 5px solid #303030;
+    color: #303030
+}
+.menuBlack:hover{
+    background: rgba(48,48,48,0.65);
+}
+
+@media (max-width:480px) {
+    body > header > nav {
+        position: relative;
+        z-index: auto;
+    }
+
+    body > header > nav a{
+        width: 100%;
+    }
+    .menuBlue{width: 100%;}
+}
+
+.concent {
+    width: calc(68% - 60px);
+    min-height: 0px;
+    margin: 30px 30px 0 30px;
+    float: left;
+}
+
+.panel {
+    width: calc(32% - 30px);
+    min-height: 400px;
+    margin: 30px 0 0 30px;
+    float:left;
+}
+
+.concent article, .panel article{
+    width: calc(100% - 40px);
+    min-height: 400px;
+    background: white;
+    padding: 20px;
+    margin: 0 0 30px 0;
+}
+
+@media (max-width:750px)  {
+    .panel {
+        width: calc(100% - 30px);
+        margin: 15px 15px 0 15px;
+    }
+
+    .concent{
+        width: calc(100% - 30px);
+        margin: 15px 15px 0 15px;
+    }
+
+    .concent article, .panel article{
+        width: calc(100% - 30px);
+        padding: 15px;
+        margin: 0 0 15px 0;
+    }
+
+}
+
+footer{
+    width: 100%;
+    height: 40px;
+    float:left;
+    font-size: 14px;
+    text-align: center;
+    line-height: 40px;
+}
+
+.concent article a, .panel article a{text-decoration: underline;}
+.concent article a:hover, .panel article a:hover{text-decoration: none;}
+
+
+img { max-width: 100%; height: auto; }
+
+
+.formField select:focus, .formField select:hover, 
+.formField textarea:hover, .formField textarea:focus,
+.formField input:hover,.formField input:focus
+{border: 1px solid #4D90FE;
+ outline:0; 
+ outline-offset: 0px;
+}
+
+.formField select{width: 100%;
+                  font-size: 16px;       
+                  padding: 4px;
+                  height:30px;
+                  border: 1px solid #dddddd;
+                  box-sizing: border-box;
+                  margin: 2px 0;}
+
+.formField textarea{width: 100%;
+                    font-size: 16px;
+                    height: 115px;
+                    padding: 4px;
+                    border: 1px solid #dddddd;
+                    box-sizing: border-box;
+                    margin: 2px 0;}
+
+.formField input{width: 100%;
+                 font-size: 16px;  
+                 padding: 4px;
+                 height:30px;
+                 border: 1px solid #dddddd;
+                 box-sizing: border-box;
+                 margin: 2px 0;}
+
+.formField{margin: 0 0 15px 0;}
+.formField span{color:#DD4B39;}
+.formField label{font-weight:bold;}
+
+.formButton input[type="submit"]{font-size:14px;height: 30px;min-width: 90px;color:white;background:#4D90FE;border: 1px solid #4D90FE;}
+.formButton input[type="submit"]:hover{color:#4D90FE;background:white;}
+.formButton a{float: right;line-height: 30px;}
+
+//.polozka:nth-child(5n + 1) 
+//.polozka:nth-child(5) ~ .polozka
+
+/*
+.error{background:#ffc0c0;color: red;}
+
+.success{background:#99ff66;color: green;}
+.success, .error{margin: 8px 8px 0px 8px;padding: 10px;font-size: 14px;}
+*/
