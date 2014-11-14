@@ -1,0 +1,55 @@
+DirectoryIndex index.php
+Options -Indexes
+
+<filesMatch "^(.htaccess|config.php)$">
+deny from all
+</filesMatch>
+
+<ifModule mod_deflate.c>
+  <filesMatch "\.(css|js)$">
+    SetOutputFilter DEFLATE
+  </filesMatch>
+</ifModule>
+
+#<ifModule mod_deflate.c>
+#  AddOutputFilterByType DEFLATE text/html text/xml text/css text/plain
+#  AddOutputFilterByType DEFLATE image/svg+xml application/xhtml+xml application/xml
+#  AddOutputFilterByType DEFLATE application/rdf+xml application/rss+xml application/atom+xml
+#  AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript application/json
+#  AddOutputFilterByType DEFLATE application/x-font-ttf application/x-font-otf
+#  AddOutputFilterByType DEFLATE font/truetype font/opentype
+#</ifModule>
+
+<ifModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 2592000 seconds"
+  ExpiresByType image/png "access plus 2592000 seconds"
+  ExpiresByType image/gif "access plus 2592000 seconds"
+  ExpiresByType text/css "access plus 604800 seconds"
+  ExpiresByType text/javascript "access plus 604800 seconds"
+  ExpiresByType application/javascript "access plus 604800 seconds"
+  ExpiresByType application/x-javascript "access plus 604800 seconds"
+</ifModule>
+
+<ifModule mod_headers.c>
+  <filesMatch "\.(jpeg|png|gif|css)$">
+    Header set Cache-Control "public"
+  </filesMatch>
+  <filesMatch "\.(js)$">
+    Header set Cache-Control "private"
+  </filesMatch>
+Header set Connection keep-alive
+Header unset ETag
+</ifModule>
+
+AddDefaultCharset utf-8
+FileETag None
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+#RewriteBase /public
+
+RewriteCond  %{REQUEST_FILENAME} !-d
+RewriteCond  %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+</IfModule>

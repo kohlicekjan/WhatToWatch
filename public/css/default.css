@@ -3,6 +3,7 @@
     padding: 0;
     border: 0;   
     text-decoration: none;
+    list-style: none;
 }
 
 h1{
@@ -15,8 +16,9 @@ a{
 
 body{
     background: #eee;
-    font:14px/1.6 normal Tahoma, Arial; 
+    font:13px/1.6 normal Tahoma, Arial; 
     color: #333;
+    
 }
 
 body > header{
@@ -34,7 +36,7 @@ body > header > nav{
     float:left;
 }
 
-body > header > nav a{
+body > header > nav li a{
     width: 17%;
     display: inline-block;
     line-height: 40px;
@@ -43,7 +45,7 @@ body > header > nav a{
     float: left;
 }
 
-body > header > nav a:hover, .activeBlue{
+body > header > nav a:hover{
     color: white;     
 }
 
@@ -60,32 +62,36 @@ body > header > nav a:hover, .activeBlue{
     border-bottom: 5px solid #81b900;
     color: #81b900;
 }
-.menuGreen:hover{
+.menuGreen:hover, .activeGreen{
     background: rgba(129,185,0,0.65);
+    color: white;
 }
 .menuYellow{
     border-bottom: 5px solid #ffb902;
     color: #ffb902;
 }
-.menuYellow:hover{
+.menuYellow:hover, .activeYellow{
     background: rgba(255,185,2,0.65);
+    color: white;
 }
 .menuRed{
     border-bottom: 5px solid #f25022;
     color: #f25022;
 }
-.menuRed:hover{
+.menuRed:hover, .activeRed{
     background: rgba(242,80,34,0.65);
+    color: white;
 }
 .menuBlack{
     border-bottom: 5px solid #303030;
     color: #303030
 }
-.menuBlack:hover{
+.menuBlack:hover, .activeBlack{
     background: rgba(48,48,48,0.65);
+    color: white;
 }
 
-@media (max-width:480px) {
+@media (max-width:480px), (max-device-width: 480px) {
     body > header > nav {
         position: relative;
         z-index: auto;
@@ -119,9 +125,20 @@ body > header > nav a:hover, .activeBlue{
     margin: 0 0 30px 0;
 }
 
-@media (max-width:750px)  {
+.concent article h1{
+    //font-size: 24px;
+    font-size: 24px;
+}
+
+.concent article p{
+   
+font-size: 16px;
+    
+}
+
+@media (max-width:750px) , (max-device-width: 750px)  {
     .panel {
-        width: calc(100% - 30px);
+        width: calc(100% - 30px);      
         margin: 15px 15px 0 15px;
     }
 
@@ -135,7 +152,6 @@ body > header > nav a:hover, .activeBlue{
         padding: 15px;
         margin: 0 0 15px 0;
     }
-
 }
 
 footer{
@@ -196,6 +212,25 @@ img { max-width: 100%; height: auto; }
 
 //.polozka:nth-child(5n + 1) 
 //.polozka:nth-child(5) ~ .polozka
+
+//class:root
+//class:empty
+//class:checked
+//class:enabled
+//class:first-child
+//class:nth-last-child(n)
+
+
+//orientation: portrait
+//only screen and (max-device-width: 320px)
+@media only screen and (max-device-width: 480px){
+font-size: 140%;
+}
+
+@media print{
+    
+    
+}
 
 /*
 .error{background:#ffc0c0;color: red;}
