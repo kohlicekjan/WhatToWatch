@@ -2,80 +2,97 @@
 
 class Form {
 
-    private $method;
     private $action;
+    private $nameForm;
+    private $isPost;
+    private $isToken;
     private $fields = [];
     private $buttons = [];
-    private $nameForm;
     private $currentField = null;
-    public $isError = false;
+    public $isError = true;
 
-    public function __construct($method, $action, $nameForm) {
-        $this->method = $method;
-        $this->action = $action;
+    public function __construct($nameForm, $action = null, $isPost = true, $isToken = true) {
         $this->nameForm = $nameForm;
+        $this->action = $action == null ? Redirect::currentUrl() : URL . $action;
+        $this->isPost = $isPost;
+        $this->isToken = ($isToken and $isPost);
+        if ($this->isToken) {
+            $this->addHidden('token', Auth::generateToken());
+        }
     }
 
-    public function getHTML() {
-        $formHtml = '<form action="' . $this->action . '" method="' . $this->method . '">';
+    public function generateHTML() {
+        $formHTML = '<form action="' . $this->action . '" method="' . ($this->isPost ? 'post' : 'get') . '">';
 
         foreach ($this->fields as $name => $field) {
             if ($field['type'] == 'hidden') {
-                $formHtml.='<input type="' . $field['type'] . '" name="' . $this->nameForm . '[' . $name . ']" value="' . $field['value'] . '">';
+                $formHTML.='<input type="' . $field['type'] . '" name="' . $this->nameForm . '[' . $name . ']" value="' . h($field['value']) . '">';
                 continue;
             }
 
-            $formHtml.='<div class="formField">';
-            $formHtml.='<label for="' . $name . '">' . $field['label'] . ($field['required'] ? '' : ' (nepovinné)') . '</label>';
+            $formHTML.='<div class="formField">';
+            $formHTML.='<label>' . $field['label'] . ((empty($field['required']) or $field['required']) ? '' : ' (nepovinné)') . '</label>';
 
-            if ($field['type'] == 'select') {
-                $formHtml.='<select name="' . $this->nameForm . '[' . $name . ']"';
-                $formHtml.=($field['required'] ? ' required' : '');
-                $formHtml.= $field['supplement'] . '>';
+            if ($field['type'] == 'info') {
+                $formHTML.='<div>' . h($field['value']) . '</div>';
+            } elseif ($field['type'] == 'select' or $field['type'] == 'multiple') {
+                $formHTML.='<select name="' . $this->nameForm . '[' . $name . ']';
+                $formHTML.= ($field['type'] == 'multiple' ? '[]" multiple="multiple"' : '"');
+                $formHTML.= ($field['required'] ? ' required' : '');
+                $formHTML.= $field['supplement'] . '>';
 
                 foreach ($field['options'] as $key => $value) {
-                    $formHtml.='<option';
-                    $formHtml.=($field['isKey'] ? ' value="' . $key . '"' : '');
-                    $formHtml.=((!$field['isKey'] and $value == $field['value'] or ( $field['isKey'] and $key == $field['value'])) ? ' selected' : '');
-                    $formHtml.='>' . $value . '</option>';
+                    $formHTML.='<option';
+                    $formHTML.=($field['isKey'] ? ' value="' . h($key) . '"' : '');
+                    if (is_array($field['value'])) {
+                        $formHTML.= in_array(($field['isKey'] ? $key : $value), $field['value']) ? ' selected' : '';
+                    } else {
+                        $formHTML.= (($field['isKey'] ? $key : $value) == $field['value']) ? ' selected' : '';
+                    }
+                    $formHTML.='>' . h($value) . '</option>';
                 }
 
-                $formHtml.='</select>';
+                $formHTML.='</select>';
             } elseif ($field['type'] == 'textarea') {
-                $formHtml.='<textarea name="' . $this->nameForm . '[' . $name . ']"';
-                $formHtml.= (empty($field['max']) ? '' : ' ');
-                $formHtml.= ($field['required'] ? ' required' : '');
-                $formHtml.= $field['supplement'] . '>' . $field['value'] . '</textarea>';
+                $formHTML.='<textarea name="' . $this->nameForm . '[' . $name . ']"';
+                $formHTML.= (empty($field['max']) ? '' : ' ');
+                $formHTML.= ($field['required'] ? ' required' : '');
+                $formHTML.= $field['supplement'] . '>' . h($field['value']) . '</textarea>';
             } else {
-                $formHtml.='<input type="' . $field['type'] . '" name="' . $this->nameForm . '[' . $name . ']" id="' . $name . '"';
-                $formHtml.= (empty($field['value']) ? '' : ' value="' . $field['value'] . '"');
-                $formHtml.= (empty($field['min']) ? '' : ' min="' . $field['min'] . '"');
-                $formHtml.= (empty($field['maxLength']) ? '' : ' maxlength="' . $field['maxLength'] . '"');
-                $formHtml.= (empty($field['max']) ? '' : ' max="' . $field['max'] . '"');
-                $formHtml.= (empty($field['pattern']) ? '' : ' pattern="' . $field['pattern'] . '"');
-                $formHtml.= ($field['required'] ? ' required' : '');
-                $formHtml.= $field['supplement'] . '>';
+                $formHTML.='<input type="' . $field['type'] . '" name="' . $this->nameForm . '[' . $name . ']"';
+                $formHTML.= ((empty($field['value']) or $field['type'] == 'password') ? '' : ' value="' . h($field['value']) . '"');
+                $formHTML.= (empty($field['min']) ? '' : ' min="' . $field['min'] . '"');
+                $formHTML.= (empty($field['maxLength']) ? '' : ' maxlength="' . $field['maxLength'] . '"');
+                $formHTML.= (empty($field['max']) ? '' : ' max="' . $field['max'] . '"');
+                $formHTML.= (empty($field['pattern']) ? '' : ' pattern="' . $field['pattern'] . '"');
+                $formHTML.= ($field['required'] ? ' required' : '');
+                $formHTML.= $field['supplement'] . '>';
             }
 
-            $formHtml.=empty($field['error']) ? '' : '<span>' . $field['error'] . '</span>';
-            $formHtml.='</div>';
+            $formHTML.=empty($field['error']) ? '' : '<span>' . $field['error'] . '</span>';
+            $formHTML.='</div>';
         }
 
-        $formHtml.='<div class="formButton">';
+        $formHTML.='<div class="formButton">';
         foreach ($this->buttons as $name => $button) {
             if ($button['supplement'] == 'link') {
-                $formHtml.='<a href="' . $name . '">' . $button['text'] . '</a>';
+                $formHTML.='<a href="' . $name . '">' . $button['text'] . '</a>';
                 continue;
             }
-            
-            $formHtml.='<input type="submit"';
-            $formHtml.=(empty($button['name']) ? '' : ' name="' . $this->nameForm . '[' . $button['name'] . ']"');
-            $formHtml.= ' value="' . $button['text'] . '"' . $button['supplement'] . '>';
-        }
-        $formHtml.='</div>';
-        $formHtml.='</form>';
 
-        return $formHtml;
+            $formHTML.='<input type="submit"';
+            $formHTML.=(empty($name) ? '' : ' name="' . $this->nameForm . '[' . $name . ']"');
+            $formHTML.= ' value="' . $button['text'] . '"' . $button['supplement'] . '>';
+        }
+        $formHTML.='</div>';
+        $formHTML.='</form>';
+
+        return $formHTML;
+    }
+
+    public function addHidden($name, $value) {
+        $this->fields[$name] = ['type' => 'hidden', 'value' => $value];
+        $this->currentField = null;
     }
 
     public function addField($label, $type, $name, $value = null, $supplement = '') {
@@ -84,10 +101,29 @@ class Form {
         return $this;
     }
 
+    public function addInfo($label, $name, $value) {
+        $this->fields[$name] = ['label' => $label, 'type' => 'info', 'value' => $value];
+    }
+
     public function addSelect($label, $name, $options, $value = null, $isKey = true, $supplement = '') {
         $this->fields[$name] = ['label' => $label, 'type' => 'select', 'options' => $options, 'value' => $value, 'isKey' => $isKey, 'required' => false, 'supplement' => $supplement, 'error' => null];
         $this->currentField = $name;
         return $this;
+    }
+
+    public function addMultiple($label, $name, $options, $value = null, $isKey = true, $supplement = '') {
+        $this->fields[$name] = ['label' => $label, 'type' => 'multiple', 'options' => $options, 'value' => $value, 'isKey' => $isKey, 'required' => false, 'supplement' => $supplement, 'error' => null];
+        $this->currentField = $name;
+        return $this;
+    }
+
+    public static function optionsLoadDB($table, $key = 'id', $value = 'name') {
+        $options = [];
+        foreach ($table as $row) {
+            $options[$row[$key]] = $row[$value];
+        }
+
+        return $options;
     }
 
     public function addButton($text, $name = null, $supplement = '') {
@@ -127,50 +163,96 @@ class Form {
 
     public function setError($name, $error) {
         $this->fields[$name]['error'] = $error;
+        $this->isError = true;
     }
 
-    public function control() {
+    public function check() {
 
-        if ($this->method == 'post' and ! empty($_POST[$this->nameForm])) {
+        if ($this->isPost and ! empty($_POST[$this->nameForm])) {
             $data = $_POST[$this->nameForm];
-        } elseif ($this->method == 'get' and ! empty($_GET[$this->nameForm])) {
+        } elseif (!$this->isPost and ! empty($_GET[$this->nameForm])) {
             $data = $_GET[$this->nameForm];
         } else {
             return;
         }
+        $this->isError = false;
+
+        if ($this->isToken) {
+            if (empty($data['token']) or ! Auth::checkToken($data['token'])) {
+                $this->isError = true;
+                Message::addError('Token se neschoduje.');
+            }
+        }
 
         foreach ($this->fields as $name => $field) {
 
-            if ($field['required'] and empty($data[$name])) {
-                $this->fields[$name]['error'] = 'Tento údaj je povinný.';
+            if ($field['type'] == 'hidden' or $field['type'] == 'info') {
+                continue;
+            } elseif (!isset($data[$name]) or $data[$name] == '') {
+                if ($field['required']) {
+                    $this->fields[$name]['error'] = 'Tento údaj je povinný.';
+                    $this->isError = true;
+                }
                 continue;
             }
 
             $this->fields[$name]['value'] = $data[$name];
 
-            if (!empty($data[$name]) and $field['type'] == 'select') {
-                if (!(!$field['isKey'] and in_array($field['value'], $field['options'])) and ! ($field['isKey'] and array_key_exists($field['value'], $field['options']))) {
+            if ($field['type'] == 'select') {
+                if ((!$field['isKey'] and ! in_array($data[$name], $field['options'])) or ( $field['isKey'] and ! array_key_exists($data[$name], $field['options']))) {
                     $this->fields[$name]['error'] = 'Poslaná hodnota neexistuje.';
                     $this->isError = true;
                 }
+            } elseif ($field['type'] == 'multiple') {
+
+                if (!is_array($data[$name]) or count($data[$name]) <= 0) {
+                    $this->fields[$name]['error'] = 'Poslaná hodnota neexistuje.';
+                    $this->isError = true;
+                    continue;
+                }
+                foreach ($data[$name] as $value) {
+                    if ((!$field['isKey'] and ! in_array($value, $field['options'])) or ( $field['isKey'] and ! array_key_exists($value, $field['options']))) {
+                        $this->fields[$name]['error'] = 'Poslaná hodnota neexistuje.';
+                        $this->isError = true;
+                        break;
+                    }
+                }
             } else {
-                if (!empty($data[$name])and ( (!empty($field['minLength']) and $field['minLength'] > strlen($data[$name])) or ( !empty($field['maxLength']) and $field['maxLength'] < strlen($data[$name])))) {
+                if ((!empty($field['minLength']) and $field['minLength'] > strlen($data[$name])) or ( !empty($field['maxLength']) and $field['maxLength'] < strlen($data[$name]))) {
                     $this->fields[$name]['error'] = 'Musíte zdat v rosahu' . (!empty($field['minLength']) ? ' od ' . $field['minLength'] : '') . (!empty($field['maxLength']) ? ' do ' . $field['maxLength'] : '') . ' znaků.';
                     $this->isError = true;
                     continue;
-                } elseif (!empty($data[$name]) and ( (!empty($field['min']) and $data[$name] < $field['min']) or ( !empty($field['max']) and $data[$name] > $field['max']))) {
+                } elseif ((!empty($field['min']) and $data[$name] < $field['min']) or ( !empty($field['max']) and $data[$name] > $field['max'])) {
                     $this->fields[$name]['error'] = 'Musíte zdat v rosahu' . (!empty($field['min']) ? ' od ' . $field['min'] : '') . (!empty($field['max']) ? ' do ' . $field['max'] : '') . '.';
                     $this->isError = true;
                     continue;
                 }
 
-                if (!empty($data[$name]) and ! empty($field['pattern']) and ! preg_match('/^(' . $field['pattern'] . ')$/', $data[$name])) {
+                if ($field['type'] == 'email' and ! filter_var($data[$name], FILTER_VALIDATE_EMAIL)) {
+                    $this->fields[$name]['error'] = 'Zadejte email.';
+                    $this->isError = true;
+                    continue;
+                } elseif (!empty($field['pattern']) and ! preg_match('/^(' . $field['pattern'] . ')$/', $data[$name])) {
                     $this->fields[$name]['error'] = 'Musíte zadat požadovaný formát.';
                     $this->isError = true;
                     continue;
                 }
             }
         }
+    }
+
+    private function s() {
+        
+    }
+
+    public function isButton($name) {
+        if ($this->isPost and ! empty($_POST[$this->nameForm])) {
+            return !empty($_POST[$this->nameForm][$name]);
+        } elseif (!$this->isPost and ! empty($_GET[$this->nameForm])) {
+            return !empty($_GET[$this->nameForm][$name]);
+        }
+
+        return false;
     }
 
     public function getData() {
@@ -180,15 +262,12 @@ class Form {
 
         $data = [];
 
-        foreach ($this->fields as $field) {
-            $data[$field['name']] = $field['value'];
+        foreach ($this->fields as $key => $field) {
+            if ($key !== 'token')
+                $data[$key] = $field['value'];
         }
 
         return $data;
-    }
-
-    function token() {
-        
     }
 
 }

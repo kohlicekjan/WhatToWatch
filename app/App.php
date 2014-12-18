@@ -1,4 +1,5 @@
 <?php
+require_once PATH_LIBS .'functions.php';
 
 class App {
 
@@ -24,33 +25,33 @@ class App {
     }
 
     private function loadController($url) {
-
-        if (!empty($url[0]) and file_exists(PATH_CONTROLLERS . $url[0] . '.php')) {
-            $this->controller = $url[0];
-            unset($url[0]);
-        } elseif (!empty($url[0])) {
-            App::Error(404);
+        $index=0;
+        if (!empty($url[$index]) and file_exists(PATH_CONTROLLERS . $url[$index] . '.php')) {
+            $this->controller = $url[$index];
+            unset($url[$index]);
+            $index++;
         }
 
         $this->controller = new $this->controller;
 
-        if (!empty($url[1]) and method_exists($this->controller, $url[1])) {
-            $reflection = new ReflectionMethod($this->controller, $url[1]);
+        if (!empty($url[$index]) and method_exists($this->controller, $url[$index])) {
+            $reflection = new ReflectionMethod($this->controller, $url[$index]);
             if ($reflection->isPublic()) {
-                $this->method = $url[1];
-                unset($url[1]);
+                $this->method = $url[$index];
+                unset($url[$index]);
             }else{
                 App::Error(404);
             }
+        }elseif(!method_exists($this->controller, $this->method)){
+            App::Error(404);
         }
 
         if ($url) {
             $this->params = array_values($url);
         }
-
         call_user_func_array([$this->controller, $this->method], $this->params);
     }
-
+    
     public static function Error($error = 404) {
         call_user_func_array([new Error(), 'index'], [$error]);
         exit;
